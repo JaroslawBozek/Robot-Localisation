@@ -18,6 +18,7 @@ import agents
 class LocWorldEnv:
     actions = "turnleft turnright forward".split()
 
+    # test
     def __init__(self, size, walls, eps_perc, eps_move):
         self.size = size
         self.walls = walls
