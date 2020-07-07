@@ -123,7 +123,7 @@ class LocAgent:
             loc_N = False
             loc_E = False
             loc_S = False
-            Loc_W = False
+            loc_W = False
 
             if (loc[0], loc[1]+1) in self.walls:
                 loc_N = True
@@ -134,84 +134,158 @@ class LocAgent:
             if (loc[0] - 1, loc[1]) in self.walls:
                 loc_W = True
 
-            # if 'fwd' in percept:
-            #     if (loc[0], loc[1]+1) in self.walls:
-            #         prob_N = prob_N*0.9
-            #     else:
-            #         prob_N = prob_N*0.1
-            #     if (loc[0] + 1, loc[1]) in self.walls:
-            #         prob_E = prob_E * 0.9
-            #     else:
-            #         prob_E = prob_E * 0.1
-            #     if (loc[0], loc[1] - 1) in self.walls:
-            #         prob_S = prob_S * 0.9
-            #     else:
-            #         prob_S = prob_S * 0.1
-            #     if (loc[0] - 1, loc[1]) in self.walls:
-            #         prob_W = prob_W * 0.9
-            #     else:
-            #         prob_W = prob_W * 0.1
-            #
-            # if 'left' in percept:
-            #     if (loc[0], loc[1]+1) in self.walls:
-            #         prob_E = prob_E*0.9
-            #     else:
-            #         prob_E = prob_E*0.1
-            #     if (loc[0] + 1, loc[1]) in self.walls:
-            #         prob_S = prob_S * 0.9
-            #     else:
-            #         prob_S = prob_S * 0.1
-            #     if (loc[0], loc[1] - 1) in self.walls:
-            #         prob_W = prob_W * 0.9
-            #     else:
-            #         prob_W = prob_W * 0.1
-            #     if (loc[0] - 1, loc[1]) in self.walls:
-            #         prob_N = prob_N * 0.9
-            #     else:
-            #         prob_N = prob_N * 0.1
-            #
-            # if 'bckwd' in percept:
-            #     if (loc[0], loc[1]+1) in self.walls:
-            #         prob_S = prob_S*0.9
-            #     else:
-            #         prob_S = prob_S*0.1
-            #     if (loc[0] + 1, loc[1]) in self.walls:
-            #         prob_W = prob_W * 0.9
-            #     else:
-            #         prob_W = prob_W * 0.1
-            #     if (loc[0], loc[1] - 1) in self.walls:
-            #         prob_N = prob_N * 0.9
-            #     else:
-            #         prob_N = prob_N * 0.1
-            #     if (loc[0] - 1, loc[1]) in self.walls:
-            #         prob_E = prob_E * 0.9
-            #     else:
-            #         prob_E = prob_E * 0.1
-            #
-            # if 'right' in percept:
-            #     if (loc[0], loc[1]+1) in self.walls:
-            #         prob_W = prob_W*0.9
-            #     else:
-            #         prob_W = prob_W*0.1
-            #     if (loc[0] + 1, loc[1]) in self.walls:
-            #         prob_N = prob_N * 0.9
-            #     else:
-            #         prob_N = prob_N * 0.1
-            #     if (loc[0], loc[1] - 1) in self.walls:
-            #         prob_E = prob_E * 0.9
-            #     else:
-            #         prob_E = prob_E * 0.1
-            #     if (loc[0] - 1, loc[1]) in self.walls:
-            #         prob_S = prob_S * 0.9
-            #     else:
-            #         prob_S = prob_S * 0.1
+            #Check forward
+            if 'fwd' in percept:
+                if loc_N == True:
+                    prob_N = prob_N * 0.9
+                else:
+                    prob_N = prob_N * 0.1
+                if loc_E == True:
+                    prob_E = prob_E * 0.9
+                else:
+                    prob_E = prob_E * 0.1
+                if loc_S == True:
+                    prob_S = prob_S * 0.9
+                else:
+                    prob_S = prob_S * 0.1
+                if loc_W == True:
+                    prob_W = prob_W * 0.9
+                else:
+                    prob_W = prob_W * 0.1
+            else:
+                if loc_N == True:
+                    prob_N = prob_N * 0.1
+                else:
+                    prob_N = prob_N * 0.9
+                if loc_E == True:
+                    prob_E = prob_E * 0.1
+                else:
+                    prob_E = prob_E * 0.9
+                if loc_S == True:
+                    prob_S = prob_S * 0.1
+                else:
+                    prob_S = prob_S * 0.9
+                if loc_W == True:
+                    prob_W = prob_W * 0.1
+                else:
+                    prob_W = prob_W * 0.9
+            #Check left
+            if 'left' in percept:
+                if loc_N == True:
+                    prob_E = prob_E * 0.9
+                else:
+                    prob_E = prob_E * 0.1
+                if loc_E == True:
+                    prob_S = prob_S * 0.9
+                else:
+                    prob_S = prob_S * 0.1
+                if loc_S == True:
+                    prob_W = prob_W * 0.9
+                else:
+                    prob_W = prob_W * 0.1
+                if loc_W == True:
+                    prob_N = prob_N * 0.9
+                else:
+                    prob_N = prob_N * 0.1
+            else:
+                if loc_N == True:
+                    prob_E = prob_E * 0.1
+                else:
+                    prob_E = prob_E * 0.9
+                if loc_E == True:
+                    prob_S = prob_S * 0.1
+                else:
+                    prob_S = prob_S * 0.9
+                if loc_S == True:
+                    prob_W = prob_W * 0.1
+                else:
+                    prob_W = prob_W * 0.9
+                if loc_W == True:
+                    prob_N = prob_N * 0.1
+                else:
+                    prob_N = prob_N * 0.9
 
+            # Check backward
+            if 'bckwd' in percept:
+                if loc_N == True:
+                    prob_S = prob_S*0.9
+                else:
+                    prob_S = prob_S*0.1
+                if loc_E == True:
+                    prob_W = prob_W * 0.9
+                else:
+                    prob_W = prob_W * 0.1
+                if loc_S == True:
+                    prob_N = prob_N * 0.9
+                else:
+                    prob_N = prob_N * 0.1
+                if loc_W == True:
+                    prob_E = prob_E * 0.9
+                else:
+                    prob_E = prob_E * 0.1
+            else:
+                if loc_N == True:
+                    prob_S = prob_S * 0.1
+                else:
+                    prob_S = prob_S * 0.9
+                if loc_E == True:
+                    prob_W = prob_W * 0.1
+                else:
+                    prob_W = prob_W * 0.9
+                if loc_S == True:
+                    prob_N = prob_N * 0.1
+                else:
+                    prob_N = prob_N * 0.9
+                if loc_W == True:
+                    prob_E = prob_E * 0.1
+                else:
+                    prob_E = prob_E * 0.9
+
+            if 'right' in percept:
+                if loc_N == True:
+                    prob_W = prob_W * 0.9
+                else:
+                    prob_W = prob_W * 0.1
+                if loc_E == True:
+                    prob_N = prob_N * 0.9
+                else:
+                    prob_N = prob_N * 0.1
+                if loc_S == True:
+                    prob_E = prob_E * 0.9
+                else:
+                    prob_E = prob_E * 0.1
+                if loc_W == True:
+                    prob_S = prob_S * 0.9
+                else:
+                    prob_S = prob_S * 0.1
+            else:
+                if loc_N == True:
+                    prob_W = prob_W * 0.1
+                else:
+                    prob_W = prob_W * 0.9
+                if loc_E == True:
+                    prob_N = prob_N * 0.1
+                else:
+                    prob_N = prob_N * 0.9
+                if loc_S == True:
+                    prob_E = prob_E * 0.1
+                else:
+                    prob_E = prob_E * 0.9
+                if loc_W == True:
+                    prob_S = prob_S * 0.1
+                else:
+                    prob_S = prob_S * 0.9
+
+            print(loc)
+            print(prob_N, prob_E, prob_S, prob_W)
+            print(percept)
             out_N = np.append(out_N, prob_N)
             out_E = np.append(out_E, prob_E)
             out_S = np.append(out_S, prob_S)
             out_W = np.append(out_W, prob_W)
 
-        print(out_N,out_E,out_S,out_W)
+        # print(self.locations)
+        # print(out_N,out_E,out_S,out_W)
         #TODO PUT YOUR CODE HERE
 
 
