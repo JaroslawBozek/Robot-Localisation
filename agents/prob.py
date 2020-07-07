@@ -3,7 +3,7 @@
 
 import random
 import numpy as np
-
+import sys
 from gridutil import *
 
 best_turn = {('N', 'E'): 'turnright',
@@ -31,14 +31,81 @@ class LocAgent:
         self.loc_to_idx = {loc: idx for idx, loc in enumerate(self.locations)}
         self.eps_perc = eps_perc
         self.eps_move = eps_move
-
+        # whether to plan next direction to move
+        self.plan_next_move = True
+        # planned direction
+        self.next_dir = None
         # previous action
         self.prev_action = None
 
-        self.P = None
+        # self.P = None
+        prob = 1.0 / len(self.locations)
+        self.P = prob * np.ones([len(self.locations)], dtype=np.float)
 
     def __call__(self, percept):
+
+        #NESW #Each dimension assumes that the robot starts in a position of N,E,S,W
         # update posterior
+        print(self.prev_action)
+        out_T = np.eye(len(self.locations))
+        out_T = np.array([out_T,out_T,out_T,out_T])
+
+        print(self.locations)
+        print(out_T.shape)
+        if self.prev_action == 'forward':
+            for i1, loc1 in enumerate(self.locations):
+                for i2, loc2 in enumerate(self.locations):
+                    loc_N = (loc1[0], loc1[1] + 1)
+                    loc_E = (loc1[0] + 1, loc1[1])
+                    loc_S = (loc1[0], loc1[1] - 1)
+                    loc_W = (loc1[0] - 1, loc1[1])
+
+
+                    if loc1 == loc2:
+                        if loc_N in self.walls:
+                            out_T[0][i1][i2] = 1.
+                        else:
+                            out_T[0][i1][i2] = 0.05
+                    else:
+                        if loc_N == loc2:
+                            out_T[0][i1][i2] = 0.95
+                        else:
+                            out_T[0][i1][i2] = 0.
+
+                    if loc1 == loc2:
+                        if loc_E in self.walls:
+                            out_T[1][i1][i2] = 1.
+                        else:
+                            out_T[1][i1][i2] = 0.05
+                    else:
+                        if loc_E == loc2:
+                            out_T[1][i1][i2] = 0.95
+                        else:
+                            out_T[1][i1][i2] = 0.
+
+                    if loc1 == loc2:
+                        if loc_S in self.walls:
+                            out_T[2][i1][i2] = 1.
+                        else:
+                            out_T[2][i1][i2] = 0.05
+                    else:
+                        if loc_S == loc2:
+                            out_T[2][i1][i2] = 0.95
+                        else:
+                            out_T[2][i1][i2] = 0.
+
+                    if loc1 == loc2:
+                        if loc_W in self.walls:
+                            out_T[3][i1][i2] = 1.
+                        else:
+                            out_T[3][i1][i2] = 0.05
+                    else:
+                        if loc_W == loc2:
+                            out_T[3][i1][i2] = 0.95
+                        else:
+                            out_T[3][i1][i2] = 0.
+
+        print(out_T)
         # TODO PUT YOUR CODE HERE
 
 
