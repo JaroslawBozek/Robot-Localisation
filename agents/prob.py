@@ -38,6 +38,7 @@ class LocAgent:
         # previous action
         self.prev_action = None
 
+
         # self.P = None
         prob = 1.0 / len(self.locations)
         self.P = prob * np.ones([len(self.locations)], dtype=np.float)
@@ -52,6 +53,8 @@ class LocAgent:
 
         print(self.locations)
         print(out_T.shape)
+
+
         if self.prev_action == 'forward':
             for i1, loc1 in enumerate(self.locations):
                 for i2, loc2 in enumerate(self.locations):
@@ -106,7 +109,110 @@ class LocAgent:
                             out_T[3][i1][i2] = 0.
 
         print(out_T)
-        # TODO PUT YOUR CODE HERE
+
+        out_N = np.array([])
+        out_E = np.array([])
+        out_S = np.array([])
+        out_W = np.array([])
+        for i, loc in enumerate(self.locations):
+            prob_N = 1.0
+            prob_E = 1.0
+            prob_S = 1.0
+            prob_W = 1.0
+
+            loc_N = False
+            loc_E = False
+            loc_S = False
+            Loc_W = False
+
+            if (loc[0], loc[1]+1) in self.walls:
+                loc_N = True
+            if (loc[0] + 1, loc[1]) in self.walls:
+                loc_E = True
+            if (loc[0], loc[1] - 1) in self.walls:
+                loc_S = True
+            if (loc[0] - 1, loc[1]) in self.walls:
+                loc_W = True
+
+            # if 'fwd' in percept:
+            #     if (loc[0], loc[1]+1) in self.walls:
+            #         prob_N = prob_N*0.9
+            #     else:
+            #         prob_N = prob_N*0.1
+            #     if (loc[0] + 1, loc[1]) in self.walls:
+            #         prob_E = prob_E * 0.9
+            #     else:
+            #         prob_E = prob_E * 0.1
+            #     if (loc[0], loc[1] - 1) in self.walls:
+            #         prob_S = prob_S * 0.9
+            #     else:
+            #         prob_S = prob_S * 0.1
+            #     if (loc[0] - 1, loc[1]) in self.walls:
+            #         prob_W = prob_W * 0.9
+            #     else:
+            #         prob_W = prob_W * 0.1
+            #
+            # if 'left' in percept:
+            #     if (loc[0], loc[1]+1) in self.walls:
+            #         prob_E = prob_E*0.9
+            #     else:
+            #         prob_E = prob_E*0.1
+            #     if (loc[0] + 1, loc[1]) in self.walls:
+            #         prob_S = prob_S * 0.9
+            #     else:
+            #         prob_S = prob_S * 0.1
+            #     if (loc[0], loc[1] - 1) in self.walls:
+            #         prob_W = prob_W * 0.9
+            #     else:
+            #         prob_W = prob_W * 0.1
+            #     if (loc[0] - 1, loc[1]) in self.walls:
+            #         prob_N = prob_N * 0.9
+            #     else:
+            #         prob_N = prob_N * 0.1
+            #
+            # if 'bckwd' in percept:
+            #     if (loc[0], loc[1]+1) in self.walls:
+            #         prob_S = prob_S*0.9
+            #     else:
+            #         prob_S = prob_S*0.1
+            #     if (loc[0] + 1, loc[1]) in self.walls:
+            #         prob_W = prob_W * 0.9
+            #     else:
+            #         prob_W = prob_W * 0.1
+            #     if (loc[0], loc[1] - 1) in self.walls:
+            #         prob_N = prob_N * 0.9
+            #     else:
+            #         prob_N = prob_N * 0.1
+            #     if (loc[0] - 1, loc[1]) in self.walls:
+            #         prob_E = prob_E * 0.9
+            #     else:
+            #         prob_E = prob_E * 0.1
+            #
+            # if 'right' in percept:
+            #     if (loc[0], loc[1]+1) in self.walls:
+            #         prob_W = prob_W*0.9
+            #     else:
+            #         prob_W = prob_W*0.1
+            #     if (loc[0] + 1, loc[1]) in self.walls:
+            #         prob_N = prob_N * 0.9
+            #     else:
+            #         prob_N = prob_N * 0.1
+            #     if (loc[0], loc[1] - 1) in self.walls:
+            #         prob_E = prob_E * 0.9
+            #     else:
+            #         prob_E = prob_E * 0.1
+            #     if (loc[0] - 1, loc[1]) in self.walls:
+            #         prob_S = prob_S * 0.9
+            #     else:
+            #         prob_S = prob_S * 0.1
+
+            out_N = np.append(out_N, prob_N)
+            out_E = np.append(out_E, prob_E)
+            out_S = np.append(out_S, prob_S)
+            out_W = np.append(out_W, prob_W)
+
+        print(out_N,out_E,out_S,out_W)
+        #TODO PUT YOUR CODE HERE
 
 
         # -----------------------
