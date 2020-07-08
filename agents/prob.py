@@ -108,9 +108,24 @@ class LocAgent:
                             out_T[3][i1][i2] = 0.
 
         if self.prev_action == 'turnleft':
-            for i1, loc1 in enumerate(self.locations):
-                for i2, loc2 in enumerate(self.locations):
-                    pass
+            new_self_P = np.ones([len(self.locations)], dtype=np.float)
+            new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
+
+            new_self_P[0] = (0.05 * self.P[0]) + (0.95 * self.P[1])
+            new_self_P[1] = (0.05 * self.P[1]) + (0.95 * self.P[2])
+            new_self_P[2] = (0.05 * self.P[2]) + (0.95 * self.P[3])
+            new_self_P[3] = (0.05 * self.P[3]) + (0.95 * self.P[0])
+            self.P = new_self_P
+
+        if self.prev_action == 'turnright':
+            new_self_P = np.ones([len(self.locations)], dtype=np.float)
+            new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
+
+            new_self_P[0] = (0.05 * self.P[0]) + (0.95 * self.P[3])
+            new_self_P[1] = (0.05 * self.P[1]) + (0.95 * self.P[0])
+            new_self_P[2] = (0.05 * self.P[2]) + (0.95 * self.P[1])
+            new_self_P[3] = (0.05 * self.P[3]) + (0.95 * self.P[2])
+            self.P = new_self_P
 
         out_N = np.array([])
         out_E = np.array([])
@@ -135,6 +150,11 @@ class LocAgent:
                 loc_S = True
             if (loc[0] - 1, loc[1]) in self.walls:
                 loc_W = True
+
+            if loc[0] == 0:
+                loc_W = True
+            if loc[0] == 15:
+                loc_E = True
 
             #Check forward
             if 'fwd' in percept:
@@ -278,8 +298,7 @@ class LocAgent:
                 else:
                     prob_S = prob_S * 0.9
 
-            print(loc)
-            print(percept)
+
             out_N = np.append(out_N, prob_N)
             out_E = np.append(out_E, prob_E)
             out_S = np.append(out_S, prob_S)
@@ -309,15 +328,15 @@ class LocAgent:
 
     def getPosterior(self):
         # directions in order 'N', 'E', 'S', 'W'
-        print(self.P)
+
         P_arr = np.zeros([self.size, self.size, 4], dtype=np.float)
+
 
         out_P_N = self.out_O[0] * np.dot(self.out_T[0].T, self.P[0])
         out_P_E = self.out_O[1] * np.dot(self.out_T[1].T, self.P[1])
         out_P_S = self.out_O[2] * np.dot(self.out_T[2].T, self.P[2])
         out_P_W = self.out_O[3] * np.dot(self.out_T[3].T, self.P[3])
         out_P = np.array([out_P_N, out_P_E, out_P_S, out_P_W])
-        print(out_P)
 
         for i, loc in enumerate(self.locations):
             for j in range(4):
