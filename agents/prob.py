@@ -42,7 +42,7 @@ class LocAgent:
         # self.P = None
         prob = 1.0 / len(self.locations)
         self.P = prob * np.ones([len(self.locations)], dtype=np.float)
-
+        self.P = np.array([self.P, self.P, self.P, self.P])
     def __call__(self, percept):
 
         #NESW #Each dimension assumes that the robot starts in a position of N,E,S,W
@@ -51,8 +51,7 @@ class LocAgent:
         out_T = np.eye(len(self.locations))
         out_T = np.array([out_T,out_T,out_T,out_T])
 
-        print(self.locations)
-        print(out_T.shape)
+
 
 
         if self.prev_action == 'forward':
@@ -108,7 +107,10 @@ class LocAgent:
                         else:
                             out_T[3][i1][i2] = 0.
 
-        print(out_T)
+        if self.prev_action == 'turnleft':
+            for i1, loc1 in enumerate(self.locations):
+                for i2, loc2 in enumerate(self.locations):
+                    pass
 
         out_N = np.array([])
         out_E = np.array([])
@@ -208,9 +210,9 @@ class LocAgent:
             # Check backward
             if 'bckwd' in percept:
                 if loc_N == True:
-                    prob_S = prob_S*0.9
+                    prob_S = prob_S * 0.9
                 else:
-                    prob_S = prob_S*0.1
+                    prob_S = prob_S * 0.1
                 if loc_E == True:
                     prob_W = prob_W * 0.9
                 else:
@@ -277,15 +279,15 @@ class LocAgent:
                     prob_S = prob_S * 0.9
 
             print(loc)
-            print(prob_N, prob_E, prob_S, prob_W)
             print(percept)
             out_N = np.append(out_N, prob_N)
             out_E = np.append(out_E, prob_E)
             out_S = np.append(out_S, prob_S)
             out_W = np.append(out_W, prob_W)
 
-        # print(self.locations)
-        # print(out_N,out_E,out_S,out_W)
+        self.out_O = np.array([out_N, out_E, out_S, out_W])
+        self.out_T = out_T
+
         #TODO PUT YOUR CODE HERE
 
 
@@ -307,14 +309,22 @@ class LocAgent:
 
     def getPosterior(self):
         # directions in order 'N', 'E', 'S', 'W'
+        print(self.P)
         P_arr = np.zeros([self.size, self.size, 4], dtype=np.float)
 
-        # put probabilities in the array
-        # TODO PUT YOUR CODE HERE
+        out_P_N = self.out_O[0] * np.dot(self.out_T[0].T, self.P[0])
+        out_P_E = self.out_O[1] * np.dot(self.out_T[1].T, self.P[1])
+        out_P_S = self.out_O[2] * np.dot(self.out_T[2].T, self.P[2])
+        out_P_W = self.out_O[3] * np.dot(self.out_T[3].T, self.P[3])
+        out_P = np.array([out_P_N, out_P_E, out_P_S, out_P_W])
+        print(out_P)
 
+        for i, loc in enumerate(self.locations):
+            for j in range(4):
+                P_arr[loc[0]][loc[1]][j] = out_P[j][i]
 
-        # -----------------------
-
+        self.P = out_P / np.sum(out_P)
+        P_arr = (P_arr/np.sum(P_arr))
         return P_arr
 
     def forward(self, cur_loc, cur_dir):
