@@ -20,6 +20,7 @@ best_turn = {('N', 'E'): 'turnright',
              ('W', 'S'): 'turnleft'}
 
 
+
 class LocAgent:
 
     def __init__(self, size, walls, eps_perc, eps_move):
@@ -37,12 +38,16 @@ class LocAgent:
         self.next_dir = None
         # previous action
         self.prev_action = None
-
+        self.first_move_made = False
+        self.transitions = np.ones([len(self.locations)], dtype=np.int)
+        self.transitions = np.array([self.transitions,self.transitions,self.transitions,self.transitions])
 
         # self.P = None
         prob = 1.0 / len(self.locations)
         self.P = prob * np.ones([len(self.locations)], dtype=np.float)
         self.P = np.array([self.P, self.P, self.P, self.P])
+
+
     def __call__(self, percept):
 
         #NESW #Each dimension assumes that the robot starts in a position of N,E,S,W
@@ -50,9 +55,6 @@ class LocAgent:
         print(self.prev_action)
         out_T = np.eye(len(self.locations))
         out_T = np.array([out_T,out_T,out_T,out_T])
-
-
-
 
         if self.prev_action == 'forward':
             for i1, loc1 in enumerate(self.locations):
@@ -156,24 +158,50 @@ class LocAgent:
             if loc[0] == 15:
                 loc_E = True
 
+
+
             #Check forward
             if 'fwd' in percept:
                 if loc_N == True:
-                    prob_N = prob_N * 0.9
+                    if 'bump' in percept:
+                        prob_N = prob_N * 1.0
+                    else:
+                        prob_N = prob_N * 0.9
                 else:
-                    prob_N = prob_N * 0.1
+                    if 'bump' in percept:
+                        prob_N = prob_N * 0.0
+                    else:
+                        prob_N = prob_N * 0.1
                 if loc_E == True:
-                    prob_E = prob_E * 0.9
+                    if 'bump' in percept:
+                        prob_E = prob_E * 1.0
+                    else:
+                        prob_E = prob_E * 0.9
                 else:
-                    prob_E = prob_E * 0.1
+                    if 'bump' in percept:
+                        prob_E = prob_E * 0.0
+                    else:
+                        prob_E = prob_E * 0.1
                 if loc_S == True:
-                    prob_S = prob_S * 0.9
+                    if 'bump' in percept:
+                        prob_S = prob_S * 1.0
+                    else:
+                        prob_S = prob_S * 0.9
                 else:
-                    prob_S = prob_S * 0.1
+                    if 'bump' in percept:
+                        prob_S = prob_S * 0.0
+                    else:
+                        prob_S = prob_S * 0.1
                 if loc_W == True:
-                    prob_W = prob_W * 0.9
+                    if 'bump' in percept:
+                        prob_W = prob_W * 1.0
+                    else:
+                        prob_W = prob_W * 0.9
                 else:
-                    prob_W = prob_W * 0.1
+                    if 'bump' in percept:
+                        prob_W = prob_W * 0.0
+                    else:
+                        prob_W = prob_W * 0.1
             else:
                 if loc_N == True:
                     prob_N = prob_N * 0.1
@@ -299,6 +327,7 @@ class LocAgent:
                     prob_S = prob_S * 0.9
 
 
+
             out_N = np.append(out_N, prob_N)
             out_E = np.append(out_E, prob_E)
             out_S = np.append(out_S, prob_S)
@@ -307,20 +336,18 @@ class LocAgent:
         self.out_O = np.array([out_N, out_E, out_S, out_W])
         self.out_T = out_T
 
-        #TODO PUT YOUR CODE HERE
+        #Planning
 
+        # for loc in self.locations:
+        #     print(loc)
 
-        # -----------------------
-
-        action = 'forward'
-        # TODO CHANGE THIS HEURISTICS TO SPEED UP CONVERGENCE
-        # if there is a wall ahead then lets turn
         if 'fwd' in percept:
             # higher chance of turning left to avoid getting stuck in one location
-            action = np.random.choice(['turnleft', 'turnright'], 1, p=[0.8, 0.2])
+            action = np.random.choice(['turnleft', 'turnright'], 1, p=[0.9, 0.1])
         else:
             # prefer moving forward to explore
-            action = np.random.choice(['forward', 'turnleft', 'turnright'], 1, p=[0.8, 0.1, 0.1])
+            action = np.random.choice(['forward', 'turnleft', 'turnright'], 1, p=[0.9, 0.05, 0.05])
+            self.first_move_made = True
 
         self.prev_action = action
 
@@ -345,6 +372,8 @@ class LocAgent:
         self.P = out_P / np.sum(out_P)
         P_arr = (P_arr/np.sum(P_arr))
         return P_arr
+
+
 
     def forward(self, cur_loc, cur_dir):
         if cur_dir == 'N':
