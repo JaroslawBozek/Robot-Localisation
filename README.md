@@ -1,6 +1,6 @@
 # lokalizacja
 
-1. Inicjalizacja
+1. Inicjalizacja.<br/>
 W inicjalizacji przygotowywana jest macierz self.P, o wymiarach 4x42. Posiada ona prawdopodobieństwo
 znalezienia się robota na każdym polu i z każdą orientacją.
 
