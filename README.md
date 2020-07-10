@@ -8,8 +8,7 @@ znalezienia się robota na każdym polu i z każdą orientacją.
 Na początku funkcji __call__ tworzona jest macierz out_T o wymiarach 4x42x42.
 W przypadku gdy robot poruszy się naprzód, owa macierz przechowuje informację o mnożniku
 prawdopodobieństwa znalezienia się na danym polu. Jeśli robot poruszył sięd o przodu to
-kolejne pole otrzymuje mnożnik 0.95, a aktualne 0.05.
-
+kolejne pole otrzymuje mnożnik 0.95, a aktualne 0.05.<br/>
 W przypadku kiedy robot się obrócił w lewo lub prawo, program operuje na macierzy self.P.<br/>
 Podczas obrotu w prawo, prawdopodobieństwa odpowiedniego kierunku przyjmują wartości:<br/>
 current_direction = 0.95 * left_direction + 0.05 * current_direction.<br/>
