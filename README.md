@@ -14,7 +14,7 @@ W przypadku kiedy robot się obrócił w lewo lub prawo, program operuje na maci
 Podczas obrotu w prawo, prawdopodobieństwa odpowiedniego kierunku przyjmują wartości:
 
 current_direction = 0.95 * left_direction + 0.05 * current_direction.
-wartości 0.95 oraz 0.05 oczywiście wynikają z szansy na to, że robot się nie obróci.
+Wartości 0.95 oraz 0.05 oczywiście wynikają z szansy na to, że robot się nie obróci.
 
 3. uwzględnienie informacji z sensorów
 Macierz self.out_O o wymiarach 4x42, posiada informację o zgodności aktualnych odczytów z 
