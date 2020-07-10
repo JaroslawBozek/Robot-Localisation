@@ -39,8 +39,7 @@ class LocAgent:
         # previous action
         self.prev_action = None
         self.first_move_made = False
-        self.transitions = np.ones([len(self.locations)], dtype=np.int)
-        self.transitions = np.array([self.transitions,self.transitions,self.transitions,self.transitions])
+
 
         # self.P = None
         prob = 1.0 / len(self.locations)
@@ -50,12 +49,12 @@ class LocAgent:
 
     def __call__(self, percept):
 
+
         #NESW #Each dimension assumes that the robot starts in a position of N,E,S,W
         # update posterior
         print(self.prev_action)
         out_T = np.eye(len(self.locations))
         out_T = np.array([out_T,out_T,out_T,out_T])
-
         if self.prev_action == 'forward':
             for i1, loc1 in enumerate(self.locations):
                 for i2, loc2 in enumerate(self.locations):
@@ -109,6 +108,16 @@ class LocAgent:
                         else:
                             out_T[3][i1][i2] = 0.
 
+                    if 'bump' in percept:
+                        if loc_N == False:
+                            self.P[0][i1] = 0.
+                        if loc_E == False:
+                            self.P[1][i1] = 0.
+                        if loc_S == False:
+                            self.P[2][i1] = 0.
+                        if loc_W == False:
+                            self.P[3][i1] = 0.
+
         if self.prev_action == 'turnleft':
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
@@ -133,6 +142,8 @@ class LocAgent:
         out_E = np.array([])
         out_S = np.array([])
         out_W = np.array([])
+
+
         for i, loc in enumerate(self.locations):
             prob_N = 1.0
             prob_E = 1.0
@@ -336,18 +347,20 @@ class LocAgent:
         self.out_O = np.array([out_N, out_E, out_S, out_W])
         self.out_T = out_T
 
+        print(self.out_O.shape)
         #Planning
 
         # for loc in self.locations:
         #     print(loc)
 
         if 'fwd' in percept:
-            # higher chance of turning left to avoid getting stuck in one location
-            action = np.random.choice(['turnleft', 'turnright'], 1, p=[0.9, 0.1])
+            if 'right' not in percept:
+                action = 'turnright'
+            else:
+                action = 'turnleft'
         else:
-            # prefer moving forward to explore
-            action = np.random.choice(['forward', 'turnleft', 'turnright'], 1, p=[0.9, 0.05, 0.05])
-            self.first_move_made = True
+            action = 'forward'
+
 
         self.prev_action = action
 
