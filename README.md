@@ -1,8 +1,8 @@
 # lokalizacja
 
 1. Inicjalizacja<br/>
-W inicjalizacji przygotowywana jest macierz self.P, o wymiarach 4x42. Posiada ona prawdopodobieństwo
-znalezienia się robota na każdym polu i z każdą orientacją.
+W inicjalizacji przygotowywana jest macierz self.P o wymiarach 4x42. Posiada ona prawdopodobieństwo
+znalezienia się robota na każdym polu z każdą możliwą orientacją.
 
 2. Uwzględnienie poprzedniej akcji<br/>
 Na początku funkcji __call__ tworzona jest macierz out_T o wymiarach 4x42x42.
@@ -15,8 +15,8 @@ current_direction = 0.95 * left_direction + 0.05 * current_direction.<br/>
 Wartości 0.95 oraz 0.05 oczywiście wynikają z szansy na to, że robot się nie obróci.
 
 3. Uwzględnienie informacji z sensorów<br/>
-Macierz self.out_O o wymiarach 4x42, posiada informację o zgodności aktualnych odczytów z 
-sensora, z każdym możliwym położeniem i orientacją robota na mapie.
+Macierz self.out_O o wymiarach 4x42 posiada informację o zgodności aktualnych odczytów z 
+sensora z każdym możliwym położeniem i orientacją robota na mapie.
 W przypadku zgodnego odczytu wynik mnożony jest *0.9, a w przypadku niezgodnego *0.1.
 
 
