@@ -48,7 +48,7 @@ class LocAgent:
 
 
     def __call__(self, percept):
-
+        #test
 
         #NESW #Each dimension assumes that the robot starts in a position of N,E,S,W
         # update posterior
