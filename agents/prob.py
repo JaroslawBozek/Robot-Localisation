@@ -48,7 +48,6 @@ class LocAgent:
 
 
     def __call__(self, percept):
-        #test
 
         #NESW #Each dimension assumes that the robot starts in a position of N,E,S,W
         # update posterior
@@ -64,59 +63,19 @@ class LocAgent:
                     loc_W = (loc1[0] - 1, loc1[1])
 
 
-                    if loc1 == loc2:
-                        if loc_N in self.walls:
-                            out_T[0][i1][i2] = 1.
-                        else:
-                            out_T[0][i1][i2] = 0.05
-                    else:
-                        if loc_N == loc2:
-                            out_T[0][i1][i2] = 0.95
-                        else:
-                            out_T[0][i1][i2] = 0.
 
-                    if loc1 == loc2:
-                        if loc_E in self.walls:
-                            out_T[1][i1][i2] = 1.
+                    locs = [loc_N,loc_E,loc_S,loc_W]
+                    for j, loc in enumerate(locs):
+                        if loc1 == loc2:
+                            if loc in self.walls:
+                                out_T[j][i1][i2] = 1.
+                            else:
+                                out_T[j][i1][i2] = 0.05
                         else:
-                            out_T[1][i1][i2] = 0.05
-                    else:
-                        if loc_E == loc2:
-                            out_T[1][i1][i2] = 0.95
-                        else:
-                            out_T[1][i1][i2] = 0.
-
-                    if loc1 == loc2:
-                        if loc_S in self.walls:
-                            out_T[2][i1][i2] = 1.
-                        else:
-                            out_T[2][i1][i2] = 0.05
-                    else:
-                        if loc_S == loc2:
-                            out_T[2][i1][i2] = 0.95
-                        else:
-                            out_T[2][i1][i2] = 0.
-
-                    if loc1 == loc2:
-                        if loc_W in self.walls:
-                            out_T[3][i1][i2] = 1.
-                        else:
-                            out_T[3][i1][i2] = 0.05
-                    else:
-                        if loc_W == loc2:
-                            out_T[3][i1][i2] = 0.95
-                        else:
-                            out_T[3][i1][i2] = 0.
-
-                    if 'bump' in percept:
-                        if loc_N == False:
-                            self.P[0][i1] = 0.
-                        if loc_E == False:
-                            self.P[1][i1] = 0.
-                        if loc_S == False:
-                            self.P[2][i1] = 0.
-                        if loc_W == False:
-                            self.P[3][i1] = 0.
+                            if loc == loc2:
+                                out_T[j][i1][i2] = 0.95
+                            else:
+                                out_T[j][i1][i2] = 0.
 
         if self.prev_action == 'turnleft':
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
@@ -155,7 +114,7 @@ class LocAgent:
             loc_S = False
             loc_W = False
 
-            if (loc[0], loc[1]+1) in self.walls:
+            if (loc[0], loc[1] + 1) in self.walls:
                 loc_N = True
             if (loc[0] + 1, loc[1]) in self.walls:
                 loc_E = True
@@ -164,55 +123,37 @@ class LocAgent:
             if (loc[0] - 1, loc[1]) in self.walls:
                 loc_W = True
 
+            #Poprawione dla różnych rozmiarów map
             if loc[0] == 0:
                 loc_W = True
-            if loc[0] == 15:
+            if loc[0] == self.size-1:
                 loc_E = True
+            if loc[1] == 0:
+                loc_S = True
+            if loc[1] == self.size-1:
+                loc_N = True
 
-
+            percept_info = ['fwd', 'left', 'bckwd', 'right']
+            locs = [loc_N, loc_E, loc_S, loc_W]
 
             #Check forward
             if 'fwd' in percept:
                 if loc_N == True:
-                    if 'bump' in percept:
-                        prob_N = prob_N * 1.0
-                    else:
-                        prob_N = prob_N * 0.9
+                    prob_N = prob_N * 0.9
                 else:
-                    if 'bump' in percept:
-                        prob_N = prob_N * 0.0
-                    else:
-                        prob_N = prob_N * 0.1
+                    prob_N = prob_N * 0.1
                 if loc_E == True:
-                    if 'bump' in percept:
-                        prob_E = prob_E * 1.0
-                    else:
-                        prob_E = prob_E * 0.9
+                    prob_E = prob_E * 0.9
                 else:
-                    if 'bump' in percept:
-                        prob_E = prob_E * 0.0
-                    else:
-                        prob_E = prob_E * 0.1
+                    prob_E = prob_E * 0.1
                 if loc_S == True:
-                    if 'bump' in percept:
-                        prob_S = prob_S * 1.0
-                    else:
-                        prob_S = prob_S * 0.9
+                    prob_S = prob_S * 0.9
                 else:
-                    if 'bump' in percept:
-                        prob_S = prob_S * 0.0
-                    else:
-                        prob_S = prob_S * 0.1
+                    prob_S = prob_S * 0.1
                 if loc_W == True:
-                    if 'bump' in percept:
-                        prob_W = prob_W * 1.0
-                    else:
-                        prob_W = prob_W * 0.9
+                    prob_W = prob_W * 0.9
                 else:
-                    if 'bump' in percept:
-                        prob_W = prob_W * 0.0
-                    else:
-                        prob_W = prob_W * 0.1
+                    prob_W = prob_W * 0.1
             else:
                 if loc_N == True:
                     prob_N = prob_N * 0.1
@@ -337,7 +278,17 @@ class LocAgent:
                 else:
                     prob_S = prob_S * 0.9
 
-
+            #Dodano Bump
+            #Jeśli otrzymano informację 'bump' to zostają tylko lokacje, które są zwrócone w kierunku ściany.
+            if 'bump' in percept:
+                if loc_N == False:
+                    prob_N = 0
+                if loc_E == False:
+                    prob_E = 0
+                if loc_S == False:
+                    prob_S = 0
+                if loc_W == False:
+                    prob_W = 0
 
             out_N = np.append(out_N, prob_N)
             out_E = np.append(out_E, prob_E)
@@ -349,9 +300,6 @@ class LocAgent:
 
         print(self.out_O.shape)
         #Planning
-
-        # for loc in self.locations:
-        #     print(loc)
 
         if 'fwd' in percept:
             if 'right' not in percept:
