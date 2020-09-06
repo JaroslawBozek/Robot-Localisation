@@ -102,12 +102,13 @@ class LocAgent:
         out_S = np.array([])
         out_W = np.array([])
 
-
+        self.next_dir = [0,0,0]
         for i, loc in enumerate(self.locations):
             prob_N = 1.0
             prob_E = 1.0
             prob_S = 1.0
             prob_W = 1.0
+
 
             loc_N = False
             loc_E = False
@@ -124,6 +125,7 @@ class LocAgent:
                 loc_W = True
 
             #Poprawione dla różnych rozmiarów map
+
             if loc[0] == 0:
                 loc_W = True
             if loc[0] == self.size-1:
@@ -133,8 +135,7 @@ class LocAgent:
             if loc[1] == self.size-1:
                 loc_N = True
 
-            percept_info = ['fwd', 'left', 'bckwd', 'right']
-            locs = [loc_N, loc_E, loc_S, loc_W]
+            loc_colls = [loc_N, loc_E, loc_S, loc_W]
 
             #Check forward
             if 'fwd' in percept:
@@ -295,19 +296,47 @@ class LocAgent:
             out_S = np.append(out_S, prob_S)
             out_W = np.append(out_W, prob_W)
 
+            print(loc_N,loc_E,loc_S,loc_W)
+            print(loc, self.P[0][i], self.P[1][i], self.P[2][i], self.P[3][i])
+
+            #Estimate next move
+
+            print(loc_colls)
+            for j in range(4):
+                if loc_colls[j] == False:
+                    print(0, j, i)
+                    self.next_dir[0] = self.next_dir[0] + self.P[j][i]
+                else:
+                    if loc_colls[(j+1)%4] == False:
+                        print(1, j,i)
+                        self.next_dir[1] = self.next_dir[1] + self.P[j][i]
+                    else:
+                        print(2, j, i)
+                        self.next_dir[2] = self.next_dir[2] + self.P[j][i]
+            print(self.next_dir)
+
         self.out_O = np.array([out_N, out_E, out_S, out_W])
         self.out_T = out_T
 
-        print(self.out_O.shape)
+        # print(self.locations)
+        # print(self.P)
         #Planning
 
-        if 'fwd' in percept:
-            if 'right' not in percept:
+        if self.next_dir[0] > self.next_dir[1] and self.next_dir[0] > self.next_dir[2]:
+            action = 'forward'
+        else:
+            if self.next_dir[1] > self.next_dir[2]:
                 action = 'turnright'
             else:
                 action = 'turnleft'
-        else:
-            action = 'forward'
+
+        # if 'fwd' in percept:
+        #     if 'right' not in percept:
+        #         action = 'turnright'
+        #     else:
+        #         action = 'turnleft'
+        # else:
+        #     action = 'forward'
 
 
         self.prev_action = action
