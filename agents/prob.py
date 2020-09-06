@@ -300,26 +300,19 @@ class LocAgent:
             print(loc, self.P[0][i], self.P[1][i], self.P[2][i], self.P[3][i])
 
             #Estimate next move
-
-            print(loc_colls)
             for j in range(4):
                 if loc_colls[j] == False:
-                    print(0, j, i)
                     self.next_dir[0] = self.next_dir[0] + self.P[j][i]
                 else:
                     if loc_colls[(j+1)%4] == False:
-                        print(1, j,i)
                         self.next_dir[1] = self.next_dir[1] + self.P[j][i]
                     else:
-                        print(2, j, i)
                         self.next_dir[2] = self.next_dir[2] + self.P[j][i]
-            print(self.next_dir)
 
         self.out_O = np.array([out_N, out_E, out_S, out_W])
         self.out_T = out_T
 
-        # print(self.locations)
-        # print(self.P)
+
         #Planning
 
         if self.next_dir[0] > self.next_dir[1] and self.next_dir[0] > self.next_dir[2]:
@@ -331,12 +324,6 @@ class LocAgent:
                 action = 'turnleft'
 
         # if 'fwd' in percept:
-        #     if 'right' not in percept:
-        #         action = 'turnright'
-        #     else:
-        #         action = 'turnleft'
-        # else:
-        #     action = 'forward'
 
 
         self.prev_action = action
