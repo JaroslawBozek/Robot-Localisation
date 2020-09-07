@@ -77,6 +77,7 @@ class LocAgent:
                             else:
                                 out_T[j][i1][i2] = 0.
 
+
         if self.prev_action == 'turnleft':
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
@@ -207,8 +208,7 @@ class LocAgent:
                     prob_N = prob_N * 0.1
                 else:
                     prob_N = prob_N * 0.9
-
-            # Check backward
+            #Check backward
             if 'bckwd' in percept:
                 if loc_N == True:
                     prob_S = prob_S * 0.9
@@ -243,7 +243,7 @@ class LocAgent:
                     prob_E = prob_E * 0.1
                 else:
                     prob_E = prob_E * 0.9
-
+            #Check right
             if 'right' in percept:
                 if loc_N == True:
                     prob_W = prob_W * 0.9
@@ -296,9 +296,8 @@ class LocAgent:
             out_S = np.append(out_S, prob_S)
             out_W = np.append(out_W, prob_W)
 
-            print(loc_N,loc_E,loc_S,loc_W)
-            print(loc, self.P[0][i], self.P[1][i], self.P[2][i], self.P[3][i])
-
+            # print(loc_N,loc_E,loc_S,loc_W)
+            # print(loc, self.P[0][i], self.P[1][i], self.P[2][i], self.P[3][i])
             #Estimate next move
             for j in range(4):
                 if loc_colls[j] == False:
@@ -306,23 +305,25 @@ class LocAgent:
                 else:
                     if loc_colls[(j+1)%4] == False:
                         self.next_dir[1] = self.next_dir[1] + self.P[j][i]
-                    else:
+                    if loc_colls[(j+3)%4] == False:
                         self.next_dir[2] = self.next_dir[2] + self.P[j][i]
 
         self.out_O = np.array([out_N, out_E, out_S, out_W])
         self.out_T = out_T
 
-
+        print(self.next_dir)
         #Planning
+        normed = [i / sum(self.next_dir) for i in self.next_dir]
+        print(normed)
+        action = np.random.choice(['forward', 'turnright', 'turnleft'], 1, p=[normed[0], normed[1], normed[2]])
 
-        if self.next_dir[0] > self.next_dir[1] and self.next_dir[0] > self.next_dir[2]:
-            action = 'forward'
-        else:
-            if self.next_dir[1] > self.next_dir[2]:
-                action = 'turnright'
-            else:
-                action = 'turnleft'
-
+        # if self.next_dir[0] > self.next_dir[1] and self.next_dir[0] > self.next_dir[2]:
+        #     action = 'forward'
+        # else:
+        #     if self.next_dir[1] > self.next_dir[2]:
+        #         action = 'turnright'
+        #     else:
+        #         action = 'turnleft'
         # if 'fwd' in percept:
 
 
