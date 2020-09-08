@@ -49,11 +49,12 @@ class LocAgent:
 
     def __call__(self, percept):
 
-        #NESW #Each dimension assumes that the robot starts in a position of N,E,S,W
         # update posterior
         print(self.prev_action)
         out_T = np.eye(len(self.locations))
         out_T = np.array([out_T,out_T,out_T,out_T])
+
+        #Aktualizacja macierzy w przypadku ruchu do przodu
         if self.prev_action == 'forward':
             for i1, loc1 in enumerate(self.locations):
                 for i2, loc2 in enumerate(self.locations):
@@ -61,8 +62,6 @@ class LocAgent:
                     loc_E = (loc1[0] + 1, loc1[1])
                     loc_S = (loc1[0], loc1[1] - 1)
                     loc_W = (loc1[0] - 1, loc1[1])
-
-
 
                     locs = [loc_N,loc_E,loc_S,loc_W]
                     for j, loc in enumerate(locs):
@@ -77,7 +76,7 @@ class LocAgent:
                             else:
                                 out_T[j][i1][i2] = 0.
 
-
+        #Aktualizacja macierzy w przypadku obrotu w lewo
         if self.prev_action == 'turnleft':
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
@@ -88,6 +87,7 @@ class LocAgent:
             new_self_P[3] = (0.05 * self.P[3]) + (0.95 * self.P[0])
             self.P = new_self_P
 
+        #Aktualizacja macierzy w przypadku obrotu w prawo
         if self.prev_action == 'turnright':
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
@@ -105,12 +105,14 @@ class LocAgent:
 
         self.next_dir = [0,0,0]
         for i, loc in enumerate(self.locations):
+
+            #Prawdopodobieństwa wystąpienia kolizji
             prob_N = 1.0
             prob_E = 1.0
             prob_S = 1.0
             prob_W = 1.0
 
-
+            #Położenie sąsiednich ścian wg mapy
             loc_N = False
             loc_E = False
             loc_S = False
@@ -125,8 +127,7 @@ class LocAgent:
             if (loc[0] - 1, loc[1]) in self.walls:
                 loc_W = True
 
-            #Poprawione dla różnych rozmiarów map
-
+            #Dla pól sąsiadujących z granicą mapy
             if loc[0] == 0:
                 loc_W = True
             if loc[0] == self.size-1:
@@ -136,176 +137,50 @@ class LocAgent:
             if loc[1] == self.size-1:
                 loc_N = True
 
-            loc_colls = [loc_N, loc_E, loc_S, loc_W]
+            loc_colls = [loc_N, loc_E, loc_S, loc_W] #Location collisions
+            dir_list = ['fwd', 'left', 'bckwd', 'right'] #Directions list
+            loc_prob_list = [prob_N, prob_E, prob_S, prob_W] #Locations probability list
 
-            #Check forward
-            if 'fwd' in percept:
-                if loc_N == True:
-                    prob_N = prob_N * 0.9
+            #Prawdopodieństwo wystąpienia kolizji biorąc pod uwagę dane z sensora
+            for j, en_dir in enumerate(dir_list):
+                if en_dir in percept:
+                    for k, loc_coll in enumerate(loc_colls):
+                        if loc_coll == True:
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.9
+                        else:
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.1
                 else:
-                    prob_N = prob_N * 0.1
-                if loc_E == True:
-                    prob_E = prob_E * 0.9
-                else:
-                    prob_E = prob_E * 0.1
-                if loc_S == True:
-                    prob_S = prob_S * 0.9
-                else:
-                    prob_S = prob_S * 0.1
-                if loc_W == True:
-                    prob_W = prob_W * 0.9
-                else:
-                    prob_W = prob_W * 0.1
-            else:
-                if loc_N == True:
-                    prob_N = prob_N * 0.1
-                else:
-                    prob_N = prob_N * 0.9
-                if loc_E == True:
-                    prob_E = prob_E * 0.1
-                else:
-                    prob_E = prob_E * 0.9
-                if loc_S == True:
-                    prob_S = prob_S * 0.1
-                else:
-                    prob_S = prob_S * 0.9
-                if loc_W == True:
-                    prob_W = prob_W * 0.1
-                else:
-                    prob_W = prob_W * 0.9
-            #Check left
-            if 'left' in percept:
-                if loc_N == True:
-                    prob_E = prob_E * 0.9
-                else:
-                    prob_E = prob_E * 0.1
-                if loc_E == True:
-                    prob_S = prob_S * 0.9
-                else:
-                    prob_S = prob_S * 0.1
-                if loc_S == True:
-                    prob_W = prob_W * 0.9
-                else:
-                    prob_W = prob_W * 0.1
-                if loc_W == True:
-                    prob_N = prob_N * 0.9
-                else:
-                    prob_N = prob_N * 0.1
-            else:
-                if loc_N == True:
-                    prob_E = prob_E * 0.1
-                else:
-                    prob_E = prob_E * 0.9
-                if loc_E == True:
-                    prob_S = prob_S * 0.1
-                else:
-                    prob_S = prob_S * 0.9
-                if loc_S == True:
-                    prob_W = prob_W * 0.1
-                else:
-                    prob_W = prob_W * 0.9
-                if loc_W == True:
-                    prob_N = prob_N * 0.1
-                else:
-                    prob_N = prob_N * 0.9
-            #Check backward
-            if 'bckwd' in percept:
-                if loc_N == True:
-                    prob_S = prob_S * 0.9
-                else:
-                    prob_S = prob_S * 0.1
-                if loc_E == True:
-                    prob_W = prob_W * 0.9
-                else:
-                    prob_W = prob_W * 0.1
-                if loc_S == True:
-                    prob_N = prob_N * 0.9
-                else:
-                    prob_N = prob_N * 0.1
-                if loc_W == True:
-                    prob_E = prob_E * 0.9
-                else:
-                    prob_E = prob_E * 0.1
-            else:
-                if loc_N == True:
-                    prob_S = prob_S * 0.1
-                else:
-                    prob_S = prob_S * 0.9
-                if loc_E == True:
-                    prob_W = prob_W * 0.1
-                else:
-                    prob_W = prob_W * 0.9
-                if loc_S == True:
-                    prob_N = prob_N * 0.1
-                else:
-                    prob_N = prob_N * 0.9
-                if loc_W == True:
-                    prob_E = prob_E * 0.1
-                else:
-                    prob_E = prob_E * 0.9
-            #Check right
-            if 'right' in percept:
-                if loc_N == True:
-                    prob_W = prob_W * 0.9
-                else:
-                    prob_W = prob_W * 0.1
-                if loc_E == True:
-                    prob_N = prob_N * 0.9
-                else:
-                    prob_N = prob_N * 0.1
-                if loc_S == True:
-                    prob_E = prob_E * 0.9
-                else:
-                    prob_E = prob_E * 0.1
-                if loc_W == True:
-                    prob_S = prob_S * 0.9
-                else:
-                    prob_S = prob_S * 0.1
-            else:
-                if loc_N == True:
-                    prob_W = prob_W * 0.1
-                else:
-                    prob_W = prob_W * 0.9
-                if loc_E == True:
-                    prob_N = prob_N * 0.1
-                else:
-                    prob_N = prob_N * 0.9
-                if loc_S == True:
-                    prob_E = prob_E * 0.1
-                else:
-                    prob_E = prob_E * 0.9
-                if loc_W == True:
-                    prob_S = prob_S * 0.1
-                else:
-                    prob_S = prob_S * 0.9
+                    for k, loc_coll in enumerate(loc_colls):
+                        if loc_coll == True:
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.1
+                        else:
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.9
 
-            #Dodano Bump
+
+            #Prawdopodobieństwo wystąpienia kolizji biorąc pod uwagę informację 'bump'
             #Jeśli otrzymano informację 'bump' to zostają tylko lokacje, które są zwrócone w kierunku ściany.
             if 'bump' in percept:
-                if loc_N == False:
-                    prob_N = 0
-                if loc_E == False:
-                    prob_E = 0
-                if loc_S == False:
-                    prob_S = 0
-                if loc_W == False:
-                    prob_W = 0
+                for j, loc_coll in enumerate(loc_colls):
+                    if loc_coll == False:
+                        loc_prob_list[j] = 0
 
-            out_N = np.append(out_N, prob_N)
-            out_E = np.append(out_E, prob_E)
-            out_S = np.append(out_S, prob_S)
-            out_W = np.append(out_W, prob_W)
+            #Dodanie prawdopodobieństw do listy
+            out_N = np.append(out_N, loc_prob_list[0])
+            out_E = np.append(out_E, loc_prob_list[1])
+            out_S = np.append(out_S, loc_prob_list[2])
+            out_W = np.append(out_W, loc_prob_list[3])
 
-            # print(loc_N,loc_E,loc_S,loc_W)
-            # print(loc, self.P[0][i], self.P[1][i], self.P[2][i], self.P[3][i])
-            #Estimate next move
+            #Obliczenie najlepszego kolejnego ruchu.
+            #Pod uwagę brane są wszystkie prawdopodobne lokacje i orientacje robota na mapie.
+            #Przykładowo, jeśli 80% lokacji, w których może znaleźć się robot nie ma przed sobą ściany, to będzie mieć on
+            #80% szansy na wykonanie ruchu do przodu.
             for j in range(4):
-                if loc_colls[j] == False:
+                if loc_colls[j] == False:   #Check Forward
                     self.next_dir[0] = self.next_dir[0] + self.P[j][i]
                 else:
-                    if loc_colls[(j+1)%4] == False:
+                    if loc_colls[(j+1)%4] == False:     #Check Right
                         self.next_dir[1] = self.next_dir[1] + self.P[j][i]
-                    if loc_colls[(j+3)%4] == False:
+                    if loc_colls[(j+3)%4] == False:     #Check Left
                         self.next_dir[2] = self.next_dir[2] + self.P[j][i]
 
         self.out_O = np.array([out_N, out_E, out_S, out_W])
@@ -313,26 +188,16 @@ class LocAgent:
 
         print(self.next_dir)
         #Planning
+
         normed = [i / sum(self.next_dir) for i in self.next_dir]
         print(normed)
         action = np.random.choice(['forward', 'turnright', 'turnleft'], 1, p=[normed[0], normed[1], normed[2]])
-
-        # if self.next_dir[0] > self.next_dir[1] and self.next_dir[0] > self.next_dir[2]:
-        #     action = 'forward'
-        # else:
-        #     if self.next_dir[1] > self.next_dir[2]:
-        #         action = 'turnright'
-        #     else:
-        #         action = 'turnleft'
-        # if 'fwd' in percept:
-
 
         self.prev_action = action
 
         return action
 
     def getPosterior(self):
-        # directions in order 'N', 'E', 'S', 'W'
 
         P_arr = np.zeros([self.size, self.size, 4], dtype=np.float)
 

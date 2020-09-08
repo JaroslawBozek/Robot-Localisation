@@ -175,7 +175,7 @@ class LocView:
 
 
 def main():
-    random.seed(25)
+    random.seed(885)
     # rate of executing actions
     rate = 1
     # chance that perception will be wrong
