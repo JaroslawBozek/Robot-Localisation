@@ -49,6 +49,7 @@ class LocAgent:
 
     def __call__(self, percept):
 
+        Temp_P = self.P
         # update posterior
         print(self.prev_action)
         out_T = np.eye(len(self.locations))
@@ -81,22 +82,22 @@ class LocAgent:
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
 
-            new_self_P[0] = (0.05 * self.P[0]) + (0.95 * self.P[1])
-            new_self_P[1] = (0.05 * self.P[1]) + (0.95 * self.P[2])
-            new_self_P[2] = (0.05 * self.P[2]) + (0.95 * self.P[3])
-            new_self_P[3] = (0.05 * self.P[3]) + (0.95 * self.P[0])
-            self.P = new_self_P
+            new_self_P[0] = (0.05 * Temp_P[0]) + (0.95 * Temp_P[1])
+            new_self_P[1] = (0.05 * Temp_P[1]) + (0.95 * Temp_P[2])
+            new_self_P[2] = (0.05 * Temp_P[2]) + (0.95 * Temp_P[3])
+            new_self_P[3] = (0.05 * Temp_P[3]) + (0.95 * Temp_P[0])
+            Temp_P = new_self_P
 
         #Aktualizacja macierzy w przypadku obrotu w prawo
         if self.prev_action == 'turnright':
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
 
-            new_self_P[0] = (0.05 * self.P[0]) + (0.95 * self.P[3])
-            new_self_P[1] = (0.05 * self.P[1]) + (0.95 * self.P[0])
-            new_self_P[2] = (0.05 * self.P[2]) + (0.95 * self.P[1])
-            new_self_P[3] = (0.05 * self.P[3]) + (0.95 * self.P[2])
-            self.P = new_self_P
+            new_self_P[0] = (0.05 * Temp_P[0]) + (0.95 * Temp_P[3])
+            new_self_P[1] = (0.05 * Temp_P[1]) + (0.95 * Temp_P[0])
+            new_self_P[2] = (0.05 * Temp_P[2]) + (0.95 * Temp_P[1])
+            new_self_P[3] = (0.05 * Temp_P[3]) + (0.95 * Temp_P[2])
+            Temp_P = new_self_P
 
         out_N = np.array([])
         out_E = np.array([])
@@ -176,12 +177,12 @@ class LocAgent:
             #80% szansy na wykonanie ruchu do przodu.
             for j in range(4):
                 if loc_colls[j] == False:   #Check Forward
-                    self.next_dir[0] = self.next_dir[0] + self.P[j][i]
+                    self.next_dir[0] = self.next_dir[0] + Temp_P[j][i]
                 else:
                     if loc_colls[(j+1)%4] == False:     #Check Right
-                        self.next_dir[1] = self.next_dir[1] + self.P[j][i]
+                        self.next_dir[1] = self.next_dir[1] + Temp_P[j][i]
                     if loc_colls[(j+3)%4] == False:     #Check Left
-                        self.next_dir[2] = self.next_dir[2] + self.P[j][i]
+                        self.next_dir[2] = self.next_dir[2] + Temp_P[j][i]
 
         self.out_O = np.array([out_N, out_E, out_S, out_W])
         self.out_T = out_T
@@ -194,18 +195,18 @@ class LocAgent:
         action = np.random.choice(['forward', 'turnright', 'turnleft'], 1, p=[normed[0], normed[1], normed[2]])
 
         self.prev_action = action
-
+        self.P = Temp_P
         return action
 
     def getPosterior(self):
 
+        Temp_P = self.P
         P_arr = np.zeros([self.size, self.size, 4], dtype=np.float)
 
-
-        out_P_N = self.out_O[0] * np.dot(self.out_T[0].T, self.P[0])
-        out_P_E = self.out_O[1] * np.dot(self.out_T[1].T, self.P[1])
-        out_P_S = self.out_O[2] * np.dot(self.out_T[2].T, self.P[2])
-        out_P_W = self.out_O[3] * np.dot(self.out_T[3].T, self.P[3])
+        out_P_N = self.out_O[0] * np.dot(self.out_T[0].T, Temp_P[0])
+        out_P_E = self.out_O[1] * np.dot(self.out_T[1].T, Temp_P[1])
+        out_P_S = self.out_O[2] * np.dot(self.out_T[2].T, Temp_P[2])
+        out_P_W = self.out_O[3] * np.dot(self.out_T[3].T, Temp_P[3])
         out_P = np.array([out_P_N, out_P_E, out_P_S, out_P_W])
 
         for i, loc in enumerate(self.locations):
