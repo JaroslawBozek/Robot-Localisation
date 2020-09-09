@@ -70,10 +70,10 @@ class LocAgent:
                             if loc in self.walls:
                                 out_T[j][i1][i2] = 1.
                             else:
-                                out_T[j][i1][i2] = 0.05
+                                out_T[j][i1][i2] = self.eps_move
                         else:
                             if loc == loc2:
-                                out_T[j][i1][i2] = 0.95
+                                out_T[j][i1][i2] = 1 - self.eps_move
                             else:
                                 out_T[j][i1][i2] = 0.
 
@@ -82,10 +82,10 @@ class LocAgent:
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
 
-            new_self_P[0] = (0.05 * Temp_P[0]) + (0.95 * Temp_P[1])
-            new_self_P[1] = (0.05 * Temp_P[1]) + (0.95 * Temp_P[2])
-            new_self_P[2] = (0.05 * Temp_P[2]) + (0.95 * Temp_P[3])
-            new_self_P[3] = (0.05 * Temp_P[3]) + (0.95 * Temp_P[0])
+            new_self_P[0] = (self.eps_move * Temp_P[0]) + ((1 - self.eps_move) * Temp_P[1])
+            new_self_P[1] = (self.eps_move * Temp_P[1]) + ((1 - self.eps_move) * Temp_P[2])
+            new_self_P[2] = (self.eps_move * Temp_P[2]) + ((1 - self.eps_move) * Temp_P[3])
+            new_self_P[3] = (self.eps_move * Temp_P[3]) + ((1 - self.eps_move) * Temp_P[0])
             Temp_P = new_self_P
 
         #Aktualizacja macierzy w przypadku obrotu w prawo
@@ -93,10 +93,10 @@ class LocAgent:
             new_self_P = np.ones([len(self.locations)], dtype=np.float)
             new_self_P = np.array([new_self_P, new_self_P, new_self_P, new_self_P])
 
-            new_self_P[0] = (0.05 * Temp_P[0]) + (0.95 * Temp_P[3])
-            new_self_P[1] = (0.05 * Temp_P[1]) + (0.95 * Temp_P[0])
-            new_self_P[2] = (0.05 * Temp_P[2]) + (0.95 * Temp_P[1])
-            new_self_P[3] = (0.05 * Temp_P[3]) + (0.95 * Temp_P[2])
+            new_self_P[0] = (self.eps_move * Temp_P[0]) + ((1 - self.eps_move) * Temp_P[3])
+            new_self_P[1] = (self.eps_move * Temp_P[1]) + ((1 - self.eps_move) * Temp_P[0])
+            new_self_P[2] = (self.eps_move * Temp_P[2]) + ((1 - self.eps_move) * Temp_P[1])
+            new_self_P[3] = (self.eps_move * Temp_P[3]) + ((1 - self.eps_move) * Temp_P[2])
             Temp_P = new_self_P
 
         out_N = np.array([])
@@ -147,15 +147,15 @@ class LocAgent:
                 if en_dir in percept:
                     for k, loc_coll in enumerate(loc_colls):
                         if loc_coll == True:
-                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.9
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * (1 - self.eps_perc)
                         else:
-                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.1
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * self.eps_perc
                 else:
                     for k, loc_coll in enumerate(loc_colls):
                         if loc_coll == True:
-                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.1
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * self.eps_perc
                         else:
-                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * 0.9
+                            loc_prob_list[(j + k) % 4] = loc_prob_list[(j + k) % 4] * (1 - self.eps_perc)
 
 
             #Prawdopodobieństwo wystąpienia kolizji biorąc pod uwagę informację 'bump'
