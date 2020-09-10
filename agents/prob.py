@@ -104,7 +104,7 @@ class LocAgent:
         out_S = np.array([])
         out_W = np.array([])
 
-        self.next_dir = [0,0,0]
+        self.next_dir = [0,0,0] #Szansa na wykonanie ruchu do przodu, w prawo i w lewo
         for i, loc in enumerate(self.locations):
 
             #Prawdopodobieństwa wystąpienia kolizji
@@ -142,7 +142,7 @@ class LocAgent:
             dir_list = ['fwd', 'left', 'bckwd', 'right'] #Directions list
             loc_prob_list = [prob_N, prob_E, prob_S, prob_W] #Locations probability list
 
-            #Prawdopodieństwo wystąpienia kolizji biorąc pod uwagę dane z sensora
+            #Prawdopodobieństwo wystąpienia kolizji biorąc pod uwagę dane z sensora
             for j, en_dir in enumerate(dir_list):
                 if en_dir in percept:
                     for k, loc_coll in enumerate(loc_colls):
@@ -187,11 +187,11 @@ class LocAgent:
         self.out_O = np.array([out_N, out_E, out_S, out_W])
         self.out_T = out_T
 
-        print(self.next_dir)
-        #Planning
 
+        #Normalizacja
         normed = [i / sum(self.next_dir) for i in self.next_dir]
-        print(normed)
+        print("Do przodu:", normed[0],",W prawo:", normed[1], ",W lewo:", normed[2])
+        #Losowanie kolejnego ruchu
         action = np.random.choice(['forward', 'turnright', 'turnleft'], 1, p=[normed[0], normed[1], normed[2]])
 
         self.prev_action = action
