@@ -24,7 +24,7 @@ For example let's take the possible state of the robot where walls exist on the 
 In the end, the probability of this state gets multiplied by 0.9*0.1*0.9*0.9=0.0729
 
 ### Transition and rotation data
-States' probabilities are also affected by robot's movement. If the robot decides to move forward, the probabilities of robot's states are also moved 'forward' in the matrix. The robot's next planned position gets multiplied by 0.95 (1 - 0.05 chance not to move) and robot's position which it moves from gets multiplied by the remaining 0.05.
+States' probabilities are also affected by robot's movement. If the robot decides to move forward, the probabilities of robot's states are also moved 'forward' in the matrix. The robot's next planned position gets multiplied by 0.95 (1 - 0.05 chance not to move) and the position it moves from gets multiplied by the remaining 0.05.
 The same operation occurs for robots rotation. If the robot bumps into a wall, all states with walls in front of them get multiplied by 1 and the remaining ones by 0.
 
 ## Heuristics
