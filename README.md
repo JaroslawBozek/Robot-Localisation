@@ -1,5 +1,5 @@
 # Robot localisation
-
+Project for @Poznan University of Technology, Institute of Robotics and Machine Intelligence.
 ## Goals:
 * Create a code that estimates robot's position on the map and allows him to localise itself in as few moves as possible.
 
